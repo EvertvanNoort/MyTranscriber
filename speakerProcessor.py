@@ -7,7 +7,8 @@ from pyannote.audio.pipelines.utils.hook import ProgressHook
 
 def Diarization(audio_path, rttm_path, model, num_speakers):
     # Create a diarization pipeline from a pretrained model
-    pipeline = Pipeline.from_pretrained(model)# , use_auth_token=token)
+    token = "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"
+    pipeline = Pipeline.from_pretrained(model, use_auth_token=token)
     # Set the execution device (CUDA if available)
     pipeline.to(torch.device("cuda:0"))
 

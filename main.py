@@ -5,7 +5,8 @@ from transcriberV3 import Transcribe
 from transcriberV3 import merge_transcriptions
 from writeChat import process_transcription_file
 
-audio_path = "/home/evert/Downloads/test.mp3"
+# audio_path = "/home/evert/Desktop/audio/Ludenbos.mp3"
+audio_path = "/home/evert/Desktop/audio/Altman.mp3"
 rttm_path = "/home/evert/Desktop/audio/output.rttm"
 output_path = "/home/evert/Desktop/audio/outputtime.txt"
 html_path = "/home/evert/Desktop/audio/output.html"
