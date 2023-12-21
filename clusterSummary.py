@@ -21,8 +21,8 @@ nlp = spacy.load('nl_core_news_lg')  # or 'nl_core_news_sm' for Dutch
 # Initialize the summarization pipeline
 # summarizer = pipeline("summarization", model="facebook/bart-large-cnn", device=device)
 # summarizer = pipeline("summarization", model="google/pegasus-cnn_dailymail", device=device)
-summarizer = pipeline("summarization", model="t5-base", device=device)
-# summarizer = pipeline("summarization", model="t5-large", device=device)
+# summarizer = pipeline("summarization", model="t5-base", device=device)
+summarizer = pipeline("summarization", model="t5-large", device=device)
 # summarizer = pipeline("summarization", model="t5-3b", device=device)
 # summarizer = pipeline("summarization", model="yhavinga/t5-v1.1-base-dutch-cnn-test", device=device)
 
@@ -81,25 +81,29 @@ def divide_into_hdp_based_paragraphs(text, threshold=0.035):
         paragraphs.append("\n")
     return paragraphs
 
-# Usage in your main program
-
 # Function to read text from a file
 def read_text_from_file(file_path):
     with open(file_path, 'r', encoding='utf-8') as file:
         return file.read()
 
-# Read text from file
-file_path = '/home/evert/Desktop/MachineLearningNL.txt'
-# file_path = '/home/evert/Desktop/wikinl.txt'
-text = read_text_from_file(file_path)
+def discard_incomplete_sentences(text):
+    doc = nlp(text)
+    sentences = list(doc.sents)
+    processed_text = ' '.join([sentence.text for sentence in sentences if sentence.text.strip().endswith((',','.', '!', '?'))])
 
-# Choose your segmentation method here
-segments = divide_into_hdp_based_paragraphs(text)
+    return processed_text
 
 # Function to count the number of words in the text
 def count_words_in_text(text):
     words = text.split()
     return len(words)
+
+# Read text from file
+file_path = '/home/evert/Desktop/MachineLearningNL.txt'
+text = read_text_from_file(file_path)
+
+# Choose your segmentation method here
+segments = divide_into_hdp_based_paragraphs(text)
 
 # Summarize each segment and combine
 full_summary = []
@@ -111,9 +115,12 @@ for segment in segments:
         try:
             # Ensure max_length is greater than the segment length
             min_length = max(10, round(word_count/3))
-            segment_summary = summarizer(segment, max_length=word_count, min_length=min_length, length_penalty= 1.0, num_beams=4, early_stopping=False)
+            segment_summary = summarizer(segment, max_length=word_count, min_length=min_length, length_penalty= 1.0, num_beams=10, early_stopping=False)
             # segment_summary = summarizer(segment, max_length=word_count, min_length=min_length, num_beams=1)
             summary_text = segment_summary[0]['summary_text']
+            
+            summary_text = discard_incomplete_sentences(summary_text)
+
             full_summary.append(summary_text)
             full_summary.append("\n")
         except Exception as e:
@@ -124,9 +131,6 @@ for segment in segments:
 # Combine all segment summaries into one
 coherent_summary = " ".join(full_summary)
 structured_text = " ".join(segments)
-
-# print(coherent_summary)
-# print(segments)
 
 # Write the coherent summary to a file
 output_file_path = '/home/evert/Desktop/coherent_summary.txt'
