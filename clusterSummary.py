@@ -8,6 +8,7 @@ from transformers import pipeline
 import spacy
 import torch
 import numpy as np
+import json
 
 device = 0 if torch.cuda.is_available() else -1
 # device = -1
@@ -19,7 +20,7 @@ device = 0 if torch.cuda.is_available() else -1
 nlp = spacy.load('nl_core_news_lg')  # or 'nl_core_news_sm' for Dutch
 
 # model_name = "t5-base"
-model_name = "google/flan-t5-xl"
+model_name = "google/flan-t5-large"
 # Initialize the summarization pipeline
 # summarizer = pipeline("summarization", model="facebook/bart-large-cnn", device=device)
 # summarizer = pipeline("summarization", model="google/pegasus-cnn_dailymail", device=device)
@@ -88,6 +89,15 @@ def read_text_from_file(file_path):
     with open(file_path, 'r', encoding='utf-8') as file:
         return file.read()
 
+# Function to read text from a JSON file
+def read_text_from_json(file_path):
+    with open(file_path, 'r', encoding='utf-8') as file:
+        transcriptions = json.load(file)
+
+    # Concatenate all transcriptions into a single text
+    combined_text = ' '.join([entry['transcription'] for entry in transcriptions])
+    return combined_text
+
 def discard_incomplete_sentences(text):
     doc = nlp(text)
     sentences = list(doc.sents)
@@ -106,12 +116,6 @@ def paraphrase_text(input_text, model_name=model_name, max_length=200):
 
     return paraphrased_text
 
-# Example usage
-# input_sentence = "The quick brown fox jumps over the lazy dog."
-# paraphrased = paraphrase_text(input_sentence)
-# print("Original:", input_sentence)
-# print("Paraphrased:", paraphrased)
-
 
 # Function to count the number of words in the text
 def count_words_in_text(text):
@@ -119,8 +123,10 @@ def count_words_in_text(text):
     return len(words)
 
 # Read text from file
-file_path = '/home/evert/Desktop/MachineLearningNL.txt'
-text = read_text_from_file(file_path)
+# file_path = '/home/evert/Desktop/MachineLearningNL.txt'
+file_path = "/home/evert/Desktop/audio/Altman_transcript.txt"
+# text = read_text_from_file(file_path)
+text = read_text_from_json(file_path)
 
 # Choose your segmentation method here
 segments = divide_into_hdp_based_paragraphs(text)

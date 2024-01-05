@@ -12,7 +12,7 @@ language = "english"
 def process_audio_file(audio_path, num_speakers):
     base_name = os.path.splitext(os.path.basename(audio_path))[0]
     rttm_path = f"/home/evert/Desktop/audio/{base_name}.rttm"
-    output_path = f"/home/evert/Desktop/audio/{base_name}_transcript.txt"
+    output_path = f"/home/evert/Desktop/audio/{base_name}_transcript.json"
     html_path = f"/home/evert/Desktop/audio/{base_name}.html"
 
     Diarization(audio_path, rttm_path, diarization_model, num_speakers)
