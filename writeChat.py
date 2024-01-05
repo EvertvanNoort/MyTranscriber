@@ -1,4 +1,4 @@
-import re
+import json
 
 def format_timestamp(seconds_float):
     total_seconds = int(float(seconds_float))
@@ -6,34 +6,46 @@ def format_timestamp(seconds_float):
     seconds = total_seconds % 60
     return f"{minutes:02d}:{seconds:02d}"
 
-def parse_line(line):
-    # Using regex to match the pattern in the line
-    match = re.match(r"Timestamp: (\d+\.\d+)s, Speaker: (\w+), Transcription: (.+)", line)
-    if match:
-        timestamp_seconds, speaker, transcription = match.groups()
-        timestamp = format_timestamp(timestamp_seconds)
-        return timestamp, speaker, transcription
+def create_html_chat_message(timestamp, speaker, transcription, speakers=None):
+    if speakers is None or speaker not in speakers:
+        speaker_name = speaker  # Use the speaker ID as the name if no mapping is provided
     else:
-        return None, None, None  # Return None values if the line doesn't match the expected pattern
+        speaker_name = speakers[speaker]
 
-def create_html_chat_message(timestamp, speaker, transcription, speakers):
-    speaker_name = speakers.get(speaker, speaker)  # Get the name from the dictionary, default to the speaker ID if not found
-    speaker_class = "user1" if speaker == "SPEAKER_01" else "user2"  # Adjust this as needed for more speakers
+    speaker_class = "user1" if speaker == "SPEAKER_01" else "user2"  # Adjust as needed
     return f'<div class="chat-message {speaker_class}">\n' \
            f'    <span class="user-name">{speaker_name}:</span>\n' \
            f'    <p>{transcription}</p>\n' \
            f'    <span class="timestamp">{timestamp}</span>\n' \
            f'</div>\n'
 
-def process_transcription_file(file_path, speakers):
-    chat_messages = ""
-    with open(file_path, 'r') as file:
-        for line in file:
-            timestamp, speaker, transcription = parse_line(line)
-            if timestamp is not None:
-                chat_messages += create_html_chat_message(timestamp, speaker, transcription, speakers)
 
-    # Embedding the CSS in the HTML file
+def update_speaker_names_in_html(html_file_path, name_mapping):
+    """
+    Update speaker names in the HTML file based on the provided name mapping.
+
+    :param html_file_path: Path to the HTML file.
+    :param name_mapping: A dictionary where keys are old names and values are new names.
+    """
+    with open(html_file_path, 'r', encoding='utf-8') as file:
+        content = file.read()
+
+    for old_name, new_name in name_mapping.items():
+        content = content.replace(old_name, new_name)
+
+    with open(html_file_path, 'w', encoding='utf-8') as file:
+        file.write(content)
+
+def process_transcription_file(file_path):#, speakers=None):
+    chat_messages = ""
+    with open(file_path, 'r', encoding='utf-8') as file:
+        transcriptions = json.load(file)
+
+    for entry in transcriptions:
+        # timestamp = format_timestamp(entry['start_time'])
+        timestamp = format_timestamp(entry['timestamp'])
+        chat_messages += create_html_chat_message(timestamp, entry['speaker'], entry['transcription'])# , speakers)
+
     html_output = f"""<!DOCTYPE html>
 <html>
 <head>
@@ -122,3 +134,11 @@ def process_transcription_file(file_path, speakers):
 </body>
 </html>"""
     return html_output
+
+# Example usage
+# speakers = {"SPEAKER_01": "Alice", "SPEAKER_02": "Bob"}  # Adjust speaker names as necessary
+# output_html = process_transcription_file('path/to/your/jsonfile.json', speakers)
+
+# Write the HTML output to a file
+# with open('output.html', 'w', encoding='utf-8') as f:
+    # f.write(output_html)

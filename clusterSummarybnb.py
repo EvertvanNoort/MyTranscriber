@@ -5,12 +5,22 @@ from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.decomposition import LatentDirichletAllocation
 from sklearn.feature_extraction.text import CountVectorizer
 from transformers import pipeline
+from transformers import BitsAndBytesConfig
 import spacy
 import torch
 import numpy as np
+import accelerate
+import bitsandbytes
 
 device = 0 if torch.cuda.is_available() else -1
 # device = -1
+
+bnb_config = BitsAndBytesConfig(
+    load_in_4bit=True,
+    bnb_4bit_use_double_quant=True,
+    bnb_4bit_quant_type="nf4",
+    bnb_4bit_compute_dtype=torch.bfloat16
+)
 
 # Load the spaCy transformer model
 # nlp = spacy.load('en_core_web_trf')
@@ -18,12 +28,17 @@ device = 0 if torch.cuda.is_available() else -1
 # nlp = spacy.load('nl_core_news_sm')  # or 'nl_core_news_sm' for Dutch
 nlp = spacy.load('nl_core_news_lg')  # or 'nl_core_news_sm' for Dutch
 
-# model_name = "t5-base"
-model_name = "google/flan-t5-xl"
+# model_name = "google/flan-t5-large"
+# model_name = 'pszemraj/led-large-book-summary'
+# model_name = "google/t5-large-ssm-nq"
+model_name = "t5-large"
+# model_name = "mistralai/Mistral-7B-v0.1"
+# model_name = "bigscience/bloomz-7b1-mt"
+# model_name = "bigscience/mt0-large"
 # Initialize the summarization pipeline
 # summarizer = pipeline("summarization", model="facebook/bart-large-cnn", device=device)
 # summarizer = pipeline("summarization", model="google/pegasus-cnn_dailymail", device=device)
-summarizer = pipeline("summarization", model=model_name, device=device)
+summarizer = pipeline("summarization", model=model_name, model_kwargs={"load_in_4bit": True})
 # summarizer = pipeline("summarization", model="t5-large", device=device)
 # summarizer = pipeline("summarization", model="t5-3b", device=device)
 # summarizer = pipeline("summarization", model="yhavinga/t5-v1.1-base-dutch-cnn-test", device=device)
