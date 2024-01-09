@@ -1,11 +1,13 @@
 import os
+import time
 import torch
 import librosa
 import json
+from rich.progress import Progress
 from transformers import AutoModelForSpeechSeq2Seq, AutoProcessor, pipeline
 
 # Function to transcribe audio to text
-def Transcribe(audio_path, rttm_path, model_id, output_path, language):
+def Transcribe(audio_path, rttm_path, model_id, output_path):#, language=None):
     device = "cuda:0" if torch.cuda.is_available() else "cpu"
     torch_dtype = torch.float16 if torch.cuda.is_available() else torch.float32
     
@@ -36,27 +38,26 @@ def Transcribe(audio_path, rttm_path, model_id, output_path, language):
 
     total_iterations = len(speaker_data)
 
-    for i, line in enumerate(speaker_data):
-        _, audio_file, _, start_time, duration, _, _, speaker, _, _ = line
-        start_time = float(start_time)
-        duration = float(duration)
+    with Progress() as progress:
+    # Adding a task to the progress bar
+        task = progress.add_task("[green]Transcribing...", total=total_iterations)
 
-        # Calculate the percentage of iterations completed
-        progress_percentage = (i + 1) / total_iterations * 100
+        for i, line in enumerate(speaker_data):
+            _, audio_file, _, start_time, duration, _, _, speaker, _, _ = line
+            start_time = float(start_time)
+            duration = float(duration)
 
-        # Print the progress percentage
-        print(f"Transcription progress: {progress_percentage:.2f}%")
+            audio, sampling_rate = librosa.load(audio_path, sr=16000, offset=start_time, duration=duration)
 
-        audio, sampling_rate = librosa.load(audio_path, sr=16000, offset=start_time, duration=duration)
+            transcription = pipe(audio)
+            text = transcription["text"]
 
-        transcription = pipe(audio)
-        text = transcription["text"]
-
-        transcriptions.append({
-            "start_time": start_time,
-            "speaker": speaker,
-            "transcription": text
-        })
+            transcriptions.append({
+                "start_time": start_time,
+                "speaker": speaker,
+                "transcription": text
+            })
+            progress.update(task, advance=1)
 
     with open(output_path, 'w', encoding="utf-8") as f:
         json.dump(transcriptions, f, ensure_ascii=False, indent=4)

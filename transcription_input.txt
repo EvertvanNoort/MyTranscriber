@@ -1,3 +1,31 @@
+#####################################################################################################################################
+#																																	#
+#	This is the input file to be fed to main.py  																					#
+#																																	#
+#	We can define a specific output type with a flag: HTML																			#
+#	This enables the output format in a chatlike .html file																			#
+#																																	#
+#	It uses the format:																												#
+#	Path, number of speakers, 																										#
+#																																	#
+#	This file has last been updates on 9-1-2024																						#
+#####################################################################################################################################
+
+#############
+# 	flags	#
+#############
+HTML
+
+#############
+# 	files	#
+#############
 /home/evert/Desktop/audio/AudioBestanden/Altman.mp3, 2
-/home/evert/Desktop/audio/AudioBestanden/Altman.mp3
-# /home/evert/Desktop/audio/AudioBestanden/Altman.mp3, 2
+
+#####################################################################################################################################
+#																																	#
+# 	888888 Yb    dP 888888 88""Yb 888888     Yb    dP    db    88b 88     88b 88  dP"Yb   dP"Yb  88""Yb 888888    dP    db    88  	#
+# 	88__    Yb  dP  88__   88__dP   88        Yb  dP    dPYb   88Yb88     88Yb88 dP   Yb dP   Yb 88__dP   88     dP    dPYb   88  	#
+# 	88""     YbdP   88""   88"Yb    88         YbdP    dP__Yb  88 Y88     88 Y88 Yb   dP Yb   dP 88"Yb    88    dP    dP__Yb  88 	# 
+# 	888888    YP    888888 88  Yb   88          YP    dP""""Yb 88  Y8     88  Y8  YbodP   YbodP  88  Yb   88   dP    dP""""Yb 88 	# 
+#																																	#
+#####################################################################################################################################
