@@ -33,6 +33,7 @@ def Transcribe(audio_path, rttm_path, model_id, output_path):#, language=None):
         speaker_data = [line.strip().split() for line in rttm_file]
 
     transcriptions = []
+    outputtext = []
 
     print('Starting transcription')
 
@@ -51,7 +52,7 @@ def Transcribe(audio_path, rttm_path, model_id, output_path):#, language=None):
 
             transcription = pipe(audio)
             text = transcription["text"]
-
+            outputtext.append(text)
             transcriptions.append({
                 "start_time": start_time,
                 "speaker": speaker,
@@ -59,14 +60,17 @@ def Transcribe(audio_path, rttm_path, model_id, output_path):#, language=None):
             })
             progress.update(task, advance=1)
 
-    with open(output_path, 'w', encoding="utf-8") as f:
-        json.dump(transcriptions, f, ensure_ascii=False, indent=4)
+    with open(output_path + ".json", 'w', encoding="utf-8") as f:
+        json.dump(transcriptions, f, ensure_ascii=False, indent=4) 
+    with open(output_path + ".txt",'w', encoding="utf-8") as f:       
+        # f.write(outputtext)
+        f.write('\n'.join(outputtext))
 
-    print('Transcription done, file written to: ', output_path)
+    # print('Transcription done, file written to: ', output_path)
 
 # Function to merge transcriptions
 def merge_transcriptions(input_file, output_file):
-    with open(input_file, 'r', encoding='utf-8') as file:
+    with open(input_file + ".json", 'r', encoding='utf-8') as file:
         transcriptions = json.load(file)
 
     merged_output = []

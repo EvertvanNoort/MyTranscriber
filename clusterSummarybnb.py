@@ -23,22 +23,22 @@ bnb_config = BitsAndBytesConfig(
 )
 
 # Load the spaCy transformer model
-# nlp = spacy.load('en_core_web_trf')
+nlp = spacy.load('en_core_web_trf')
 # nlp = spacy.load('en_core_web_sm')  # or 'nl_core_news_sm' for Dutch
 # nlp = spacy.load('nl_core_news_sm')  # or 'nl_core_news_sm' for Dutch
-nlp = spacy.load('nl_core_news_lg')  # or 'nl_core_news_sm' for Dutch
+# nlp = spacy.load('nl_core_news_lg')  # or 'nl_core_news_sm' for Dutch
 
-# model_name = "google/flan-t5-large"
+model_name = "google/flan-t5-large"
 # model_name = 'pszemraj/led-large-book-summary'
 # model_name = "google/t5-large-ssm-nq"
-model_name = "t5-large"
+# model_name = "t5-large"
 # model_name = "mistralai/Mistral-7B-v0.1"
 # model_name = "bigscience/bloomz-7b1-mt"
 # model_name = "bigscience/mt0-large"
 # Initialize the summarization pipeline
 # summarizer = pipeline("summarization", model="facebook/bart-large-cnn", device=device)
 # summarizer = pipeline("summarization", model="google/pegasus-cnn_dailymail", device=device)
-summarizer = pipeline("summarization", model=model_name, model_kwargs={"load_in_4bit": True})
+summarizer = pipeline("summarization", model=model_name, model_kwargs={"load_in_8bit": True})
 # summarizer = pipeline("summarization", model="t5-large", device=device)
 # summarizer = pipeline("summarization", model="t5-3b", device=device)
 # summarizer = pipeline("summarization", model="yhavinga/t5-v1.1-base-dutch-cnn-test", device=device)
@@ -48,9 +48,9 @@ def create_hdp_model(dictionary, corpus):
     hdp = HdpModel(corpus, id2word=dictionary)
     return hdp
 
-# Function to divide text into paragraphs using HDP-based topics
-def divide_into_hdp_based_paragraphs(text, threshold=0.035):
-# def divide_into_hdp_based_paragraphs(text, threshold=0.01):
+# Function to divide text into paragraphs using HDP-based topics, threshold: 1 --> many paragraphs. 0 --> 1 paragraph
+# def divide_into_hdp_based_paragraphs(text, threshold=0.035):
+def divide_into_hdp_based_paragraphs(text, threshold=0):
     doc = nlp(text)
     sentences = [sent.text.strip() for sent in doc.sents]
     processed_sentences = [preprocess_string(sent) for sent in sentences]
@@ -134,7 +134,8 @@ def count_words_in_text(text):
     return len(words)
 
 # Read text from file
-file_path = '/home/evert/Desktop/MachineLearningNL.txt'
+# file_path = '/home/evert/Desktop/MachineLearningNL.txt'
+file_path = '/home/evert/Desktop/audio/1_transcript.txt'
 text = read_text_from_file(file_path)
 
 # Choose your segmentation method here
@@ -150,7 +151,8 @@ for segment in segments:
         try:
             # Ensure max_length is greater than the segment length
             min_length = max(10, round(word_count/3))
-            segment_summary = summarizer(segment, max_length=word_count, min_length=min_length, length_penalty= 1.0, num_beams=10, early_stopping=False)
+            # segment_summary = summarizer(segment, max_length=word_count, min_length=min_length, length_penalty= 2.0, num_beams=10, early_stopping=False)
+            segment_summary = summarizer(segment, max_length=word_count, min_length=min_length, length_penalty= 2.0, num_beams=4, early_stopping=True)
             # segment_summary = summarizer(segment, max_length=word_count, min_length=min_length, num_beams=1)
             summary_text = segment_summary[0]['summary_text']
             
