@@ -6,13 +6,17 @@ def format_timestamp(seconds_float):
     seconds = total_seconds % 60
     return f"{minutes:02d}:{seconds:02d}"
 
-def create_html_chat_message(timestamp, speaker, transcription, speakers=None):
-    if speakers is None or speaker not in speakers:
+def create_html_chat_message(timestamp, speaker, transcription, speakers=None, speakers_name=None):
+    if speakers_name is None or speaker not in speakers_name:
         speaker_name = speaker  # Use the speaker ID as the name if no mapping is provided
     else:
-        speaker_name = speakers[speaker]
+        speaker_name = speakers_name[speaker]
 
-    speaker_class = "user1" if speaker == "SPEAKER_01" else "user2"  # Adjust as needed
+    max_different_chatboxes = 4
+    chatbox_kind = int(speaker[-1]) % max_different_chatboxes
+
+    # speaker_class = "user1" if speaker == "SPEAKER_01" else "user2"  # Adjust as needed
+    speaker_class = ''.join(['user',str(chatbox_kind)])
     return f'<div class="chat-message {speaker_class}">\n' \
            f'    <span class="user-name">{speaker_name}:</span>\n' \
            f'    <p>{transcription}</p>\n' \
@@ -95,16 +99,50 @@ def process_transcription_file(file_path):#, speakers=None):
         position: relative;
     }}
 
+    .user0 {{
+        background-color: #99c1de;
+        text-align: left;
+    }}
+
     .user1 {{
-        background-color: #e6f7ff;
+        background-color: #eddcd2;
         text-align: left;
     }}
 
     .user2 {{
+        background-color: #d6e2e9;
+        text-align: left;
+    }}
+
+    .user3 {{
+        background-color: #fde2e4;
+        text-align: left;
+    }}
+
+    .user4 {{
+        background-color: #dbe7e4;
+        text-align: left;
+    }}
+
+    .user5 {{
+        background-color: #fad2e1;
+        text-align: left;
+    }}
+
+    .user6 {{
         background-color: #fff0f6;
         text-align: left;
     }}
 
+    .user7 {{
+        background-color: #fff0f6;
+        text-align: left;
+    }}
+
+    .user8 {{
+        background-color: #fff0f6;
+        text-align: left;
+    }}
     .user-name {{
         font-weight: bold;
         display: block;
@@ -126,8 +164,8 @@ def process_transcription_file(file_path):#, speakers=None):
 </head>
 <body>
     <div class="chat-container">
-        <h1 class="chat-title">Unleashing the Creative Power of Language Models</h1>
-        <h2 class="chat-subtitle">This is an AI-powered transcription of a conversation. The conversation can be found via this <a href="https://www.youtube.com/watch?v=LAt7q-Qsfi8&list=PPSV">link</a>:</h2>
+        <h1 class="chat-title">SNOEK OP ZOLDER #34 met Edith van de Weg en Pieter Jeekel van de werkgroep Gezondheid en Zorg van de Nederlandse AI Coalitie</h1>
+        <h2 class="chat-subtitle">This is an AI-powered transcription of a conversation. The conversation can be found via this <a href="https://nlaic.com/bouwstenen/mensgerichte-ai/nieuwe-wetenschapspodcast-over-artificial-intelligence-snoek-op-zolder/">link</a>:</h2>
         {chat_messages}
         <h3 class="chat-titlenote">his transcription has been by Evert van Noort. More information can be found on <a href="http://www.evertvannoort.com/AI">evertvannoort.com/AI</a></h3>
     </div>

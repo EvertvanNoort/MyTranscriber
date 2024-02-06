@@ -22,9 +22,9 @@ def Transcribe(audio_path, rttm_path, model_id, output_path):#, language=None):
         tokenizer=processor.tokenizer,
         feature_extractor=processor.feature_extractor,
         max_new_tokens=128,
-        chunk_length_s=30,
+        chunk_length_s=40,
         batch_size=16,
-        return_timestamps=True,
+        return_timestamps=False,
         torch_dtype=torch_dtype,
         device=device,
     )
@@ -50,17 +50,17 @@ def Transcribe(audio_path, rttm_path, model_id, output_path):#, language=None):
 
             audio, sampling_rate = librosa.load(audio_path, sr=16000, offset=start_time, duration=duration)
 
-            transcription = pipe(audio)
+            transcription = pipe(audio, generate_kwargs={"language": "dutch", "task": "transcribe"})
             text = transcription["text"]
             outputtext.append(text)
             transcriptions.append({
-                "start_time": start_time,
+                "timestamp": start_time,
                 "speaker": speaker,
                 "transcription": text
             })
             progress.update(task, advance=1)
 
-    with open(output_path + ".json", 'w', encoding="utf-8") as f:
+    with open(output_path, 'w', encoding="utf-8") as f:
         json.dump(transcriptions, f, ensure_ascii=False, indent=4) 
     with open(output_path + ".txt",'w', encoding="utf-8") as f:       
         # f.write(outputtext)
@@ -70,7 +70,7 @@ def Transcribe(audio_path, rttm_path, model_id, output_path):#, language=None):
 
 # Function to merge transcriptions
 def merge_transcriptions(input_file, output_file):
-    with open(input_file + ".json", 'r', encoding='utf-8') as file:
+    with open(input_file, 'r', encoding='utf-8') as file:
         transcriptions = json.load(file)
 
     merged_output = []
@@ -81,7 +81,7 @@ def merge_transcriptions(input_file, output_file):
     for entry in transcriptions:
         speaker = entry['speaker']
         transcription = entry['transcription']
-        timestamp = f"{entry['start_time']:.2f}"
+        timestamp = f"{entry['timestamp']:.2f}"
 
         if speaker == current_speaker:
             current_transcription += " " + transcription.strip()

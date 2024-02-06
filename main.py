@@ -6,24 +6,26 @@ from writeChat import update_speaker_names_in_html
 from extractive_summary import get_important_sentences
 
 diarization_model = "pyannote/speaker-diarization-3.0"
-transcription_model = "openai/whisper-large-v3"
+transcription_model = "openai/whisper-large-v2"
+# transcription_model = "openai/whisper-large-v3"
 # transcription_model = "openai/whisper-tiny"
 
 # Function to process a single audio file
 def process_audio_file(audio_path, num_speakers, HTML):
     base_name = os.path.splitext(os.path.basename(audio_path))[0]
     rttm_path = f"/home/evert/Desktop/audio/{base_name}.rttm"
-    output_path = f"/home/evert/Desktop/audio/{base_name}_transcript"
+    output_path = f"/home/evert/Desktop/audio/{base_name}_transcript.json"
     html_path = f"/home/evert/Desktop/audio/{base_name}.html"
     summary_path = f"/home/evert/Desktop/audio/{base_name}_sum.txt"
 
     # Diarization(audio_path, rttm_path, diarization_model, num_speakers)
     # Transcribe(audio_path, rttm_path, transcription_model, output_path)#, language=None)
     # merge_transcriptions(output_path, output_path)
+    # print("number of speakers: ", speakers)
 
     # speakers = {f"SPEAKER_{str(i).zfill(2)}": f"Speaker {i+1}" for i in range(num_speakers)}
     if (HTML==1):
-        html_content = process_transcription_file(output_path)#, speakers)
+        html_content = process_transcription_file(output_path)# , speakers)#, speaker_names)
         # Write the result to an HTML file
         with open(html_path, 'w') as file:
             file.write(html_content)

@@ -24,7 +24,7 @@ def Diarization(audio_path, rttm_path, model, num_speakers=None):
         # Use the specified number of speakers
         with ProgressHook() as hook:
             diarization = pipeline({"waveform": waveform, "sample_rate": sample_rate}, hook=hook, num_speakers=num_speakers)
-
+             
     # Dump the diarization output to disk using RTTM format
     with open(rttm_path, "w") as rttm_file:
         diarization.write_rttm(rttm_file)
@@ -37,7 +37,7 @@ def Diarization(audio_path, rttm_path, model, num_speakers=None):
     output_rttm_path = rttm_path
 
     # max_duration = 30       # Maximum duration for each fragment
-    min_duration = 0.5     # Maximum duration for each fragment
+    min_duration = 0.7     # Minimum duration for each fragment
 
     # new_end = splitLongFragments(input_rttm_path, output_rttm_path, max_duration)
 
@@ -50,3 +50,4 @@ def Diarization(audio_path, rttm_path, model, num_speakers=None):
     removeShortFragments(input_rttm_path, output_rttm_path, min_duration)
 
     print('Fragments fixed')
+
