@@ -1,4 +1,5 @@
 import json
+import os
 
 def format_timestamp(seconds_float):
     total_seconds = int(float(seconds_float))
@@ -164,8 +165,8 @@ def process_transcription_file(file_path):#, speakers=None):
 </head>
 <body>
     <div class="chat-container">
-        <h1 class="chat-title">SNOEK OP ZOLDER #34 met Edith van de Weg en Pieter Jeekel van de werkgroep Gezondheid en Zorg van de Nederlandse AI Coalitie</h1>
-        <h2 class="chat-subtitle">This is an AI-powered transcription of a conversation. The conversation can be found via this <a href="https://nlaic.com/bouwstenen/mensgerichte-ai/nieuwe-wetenschapspodcast-over-artificial-intelligence-snoek-op-zolder/">link</a>:</h2>
+        <h1 class="chat-title">{os.path.splitext(os.path.basename(file_path))[0]}</h1>
+        <h2 class="chat-subtitle">This is an AI-powered transcription of a conversation.</h2>
         {chat_messages}
         <h3 class="chat-titlenote">his transcription has been by Evert van Noort. More information can be found on <a href="http://www.evertvannoort.com/AI">evertvannoort.com/AI</a></h3>
     </div>

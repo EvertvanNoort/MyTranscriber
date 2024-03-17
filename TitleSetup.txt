@@ -1,0 +1,12 @@
+###################################################
+# This is a template for the transcription output #
+###################################################
+
+# <body>
+#     <div class="chat-container">
+#         <h1 class="chat-title">SNOEK OP ZOLDER #34 met Edith van de Weg en Pieter Jeekel van de werkgroep Gezondheid en Zorg van de Nederlandse AI Coalitie</h1>
+#         <h2 class="chat-subtitle">This is an AI-powered transcription of a conversation. The conversation can be found via this <a href="https://nlaic.com/bouwstenen/mensgerichte-ai/nieuwe-wetenschapspodcast-over-artificial-intelligence-snoek-op-zolder/">link</a>:</h2>
+#         {chat_messages}
+#         <h3 class="chat-titlenote">his transcription has been by Evert van Noort. More information can be found on <a href="http://www.evertvannoort.com/AI">evertvannoort.com/AI</a></h3>
+#     </div>
+# </body>

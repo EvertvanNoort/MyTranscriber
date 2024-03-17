@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Transcription Interface</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f0f0;
+            padding: 20px;
+        }
+        form {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            margin-top: 10px;
+            display: block;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="file"], input[type="checkbox"] {
+            margin-top: 5px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #message {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #ddffdd;
+            border: 1px solid #green;
+        }
+        .error {
+            background-color: #ffdddd;
+            border: 1px solid #red;
+        }
+    </style>
+</head>
+<body>
+    <form id="transcriptionForm" enctype="multipart/form-data">
+        <label for="audioFile">Upload audio file:</label>
+        <input type="file" id="audioFile" name="audioFile" required><br><br>
+
+        <label for="htmlOutput">HTML Output:</label>
+        <input type="checkbox" id="htmlOutput" name="htmlOutput"><br><br>
+
+        <button type="button" onclick="submitForm()">Transcribe</button>
+        <a id="downloadLink" style="display:none; background-color: #4CAF50; color: white; padding: 10px 15px; margin: 10px 0; border: none; border-radius: 4px; cursor: pointer; text-decoration: none;"  download>Download</a>
+    </form>
+
+    <div id="message"></div>
+
+    <script>
+        async function submitForm() {
+            const formData = new FormData(document.getElementById('transcriptionForm'));
+            const messageDiv = document.getElementById('message');
+            const downloadLink = document.getElementById('downloadLink');
+
+            // Reset UI elements
+            messageDiv.style.display = 'none';
+            downloadLink.style.display = 'none';
+
+            try {
+                const response = await fetch('http://localhost:5000/transcribe', {
+                    method: 'POST',
+                    body: formData,
+                });
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const result = await response.json();
+
+                // Display message and configure download link
+                messageDiv.textContent = result.message;
+                messageDiv.className = 'success';
+                messageDiv.style.display = 'block';
+
+                if (result.filePath) {
+                    downloadLink.href = `/home/evert/Desktop/audio/${result.filePath}`; // Make sure this path is correct
+                    downloadLink.style.display = 'inline-block';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                messageDiv.textContent = `Error: ${error.message}`;
+                messageDiv.className = 'error';
+                messageDiv.style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>

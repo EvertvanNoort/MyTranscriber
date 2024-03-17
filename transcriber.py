@@ -50,7 +50,9 @@ def Transcribe(audio_path, rttm_path, model_id, output_path):#, language=None):
 
             audio, sampling_rate = librosa.load(audio_path, sr=16000, offset=start_time, duration=duration)
 
-            transcription = pipe(audio, generate_kwargs={"language": "dutch", "task": "transcribe"})
+            # transcription = pipe(audio, generate_kwargs={"language": "dutch", "task": "transcribe"})
+            transcription = pipe(audio, generate_kwargs={"task": "transcribe"})
+            # transcription = pipe(audio, generate_kwargs={"language": "spanish"})#, "task": "transcribe"})
             text = transcription["text"]
             outputtext.append(text)
             transcriptions.append({
@@ -60,17 +62,18 @@ def Transcribe(audio_path, rttm_path, model_id, output_path):#, language=None):
             })
             progress.update(task, advance=1)
 
-    with open(output_path, 'w', encoding="utf-8") as f:
+    with open(output_path + ".json", 'w', encoding="utf-8") as f:
         json.dump(transcriptions, f, ensure_ascii=False, indent=4) 
+
     with open(output_path + ".txt",'w', encoding="utf-8") as f:       
         # f.write(outputtext)
         f.write('\n'.join(outputtext))
 
-    # print('Transcription done, file written to: ', output_path)
+  
 
 # Function to merge transcriptions
 def merge_transcriptions(input_file, output_file):
-    with open(input_file, 'r', encoding='utf-8') as file:
+    with open(input_file + ".json", 'r', encoding='utf-8') as file:
         transcriptions = json.load(file)
 
     merged_output = []
@@ -103,9 +106,15 @@ def merge_transcriptions(input_file, output_file):
             "speaker": current_speaker,
             "transcription": current_transcription.strip()
         })
+    with open(output_file + "_elaborate.txt",'w', encoding="utf-8") as f: 
+        f.write("".join([current_timestamp," - ", current_speaker, ": ", current_transcription]))
 
-    with open(output_file, 'w', encoding='utf-8') as file:
+    with open(output_file + ".json", 'w', encoding='utf-8') as file:
         json.dump(merged_output, file, ensure_ascii=False, indent=4)
+    
+    # with open(output_file + "elaborate.txt",'w', encoding="utf-8") as f:       
+        # f.write(outputtext)
+        # f.write('\n'.join(merged_output[2]))  
 
 # Example usage
 # audio_path = '/path/to/audio.mp3'

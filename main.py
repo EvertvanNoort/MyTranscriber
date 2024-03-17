@@ -1,4 +1,5 @@
 import os
+import zipfile
 from speakerProcessor import Diarization
 from transcriber import Transcribe, merge_transcriptions
 from writeChat import process_transcription_file
@@ -12,33 +13,47 @@ transcription_model = "openai/whisper-large-v2"
 
 # Function to process a single audio file
 def process_audio_file(audio_path, num_speakers, HTML):
+    # print("made it here")
+    # input_file = 'transcription_input.txt'
     base_name = os.path.splitext(os.path.basename(audio_path))[0]
     rttm_path = f"/home/evert/Desktop/audio/{base_name}.rttm"
-    output_path = f"/home/evert/Desktop/audio/{base_name}_transcript.json"
+    output_path = f"/home/evert/Desktop/audio/{base_name}"
     html_path = f"/home/evert/Desktop/audio/{base_name}.html"
     summary_path = f"/home/evert/Desktop/audio/{base_name}_sum.txt"
 
-    # Diarization(audio_path, rttm_path, diarization_model, num_speakers)
-    # Transcribe(audio_path, rttm_path, transcription_model, output_path)#, language=None)
-    # merge_transcriptions(output_path, output_path)
-    # print("number of speakers: ", speakers)
+    Diarization(audio_path, rttm_path, diarization_model, num_speakers)
+    Transcribe(audio_path, rttm_path, transcription_model, output_path)#, language=None)
+    merge_transcriptions(output_path, output_path)
 
-    # speakers = {f"SPEAKER_{str(i).zfill(2)}": f"Speaker {i+1}" for i in range(num_speakers)}
     if (HTML==1):
-        html_content = process_transcription_file(output_path)# , speakers)#, speaker_names)
+        html_content = process_transcription_file(output_path + ".json")# , speakers)#, speaker_names)
         # Write the result to an HTML file
         with open(html_path, 'w') as file:
             file.write(html_content)
         print("HTML construction done, file written to:", html_path)
+    # The names of the files to be zipped
+    file_names = [output_path + ".json",output_path + ".txt",output_path + "_elaborate.txt",html_path]
+    zip_name = output_path
+
+    # Create a ZIP file
+    with zipfile.ZipFile(zip_name + ".zip", 'w') as myzip:
+        for file_name in file_names:
+            # Add file to the ZIP file
+            base_file_name = os.path.basename(file_name)
+            # Add file to the ZIP file with only the base filename
+            myzip.write(file_name, arcname=base_file_name)
+
+        print(f'Created {zip_name} containing {file_names}')
 
     if (SUM==1):
         get_important_sentences(output_path + ".txt", summary_path, prob_threshold=0.8)
 
-HTML = 0
+HTML = 1
 SUM = 0
 
+input_file = 'transcription_input.txt'
 # Read the input file and process each audio file listed
-with open('transcription_input.txt', 'r') as file:
+with open(input_file, 'r') as file:
     for line in file:
         line = line.strip()
         if line=='HTML':

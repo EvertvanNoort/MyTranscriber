@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transcription Interface</title>
+</head>
+<body>
+    <form id="transcriptionForm">
+        <label for="audioPath">Audio File Path:</label>
+        <input type="text" id="audioPath" name="audioPath"><br><br>
+
+        <label for="htmlOutput">HTML Output:</label>
+        <input type="checkbox" id="htmlOutput" name="htmlOutput"><br><br>
+
+        <button type="button" onclick="submitForm()">Transcribe</button>
+    </form>
+
+    <script>
+        function submitForm() {
+            const formData = new FormData(document.getElementById('transcriptionForm'));
+            // Convert form data to an object
+            let formObject = {};
+            formData.forEach((value, key) => formObject[key] = value);
+            formObject['htmlOutput'] = document.getElementById('htmlOutput').checked;
+
+            // Send the form data to your backend
+            fetch('/transcribe', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formObject),
+            }).then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                // Handle success response, maybe redirect or display a message
+            }).catch((error) => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</body>
+</html>
