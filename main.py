@@ -4,7 +4,7 @@ from speakerProcessor import Diarization
 from transcriber import Transcribe, merge_transcriptions
 from writeChat import process_transcription_file
 from writeChat import update_speaker_names_in_html
-from extractive_summary import get_important_sentences
+from extractiveSummary import get_important_sentences
 
 diarization_model = "pyannote/speaker-diarization-3.0"
 transcription_model = "openai/whisper-large-v2"
