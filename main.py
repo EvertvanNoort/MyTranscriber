@@ -25,6 +25,8 @@ def process_audio_file(audio_path, num_speakers, HTML, zip_name):
         Transcribe(audio_path, rttm_path, transcription_model, output_path)
         merge_transcriptions(output_path, output_path)
 
+        os.remove(rttm_path)
+
         if HTML == 1:
             html_content = process_transcription_file(output_path + ".json")
             with open(html_path, 'w') as file:
@@ -36,12 +38,14 @@ def process_audio_file(audio_path, num_speakers, HTML, zip_name):
             for file_name in file_names:
                 base_file_name = os.path.basename(file_name)
                 myzip.write(file_name, arcname="".join([base_name, "/", base_file_name]))
+                os.remove(file_name)
             logging.info(f'Created {zip_name}.zip containing {file_names}')
 
         if SUM == 1:
             get_important_sentences(output_path + ".txt", summary_path, prob_threshold=0.8)
     except Exception as e:
         logging.error(f"Error processing {audio_path}: {str(e)}")
+        print(e)
 
 HTML = 1
 SUM = 0
@@ -51,7 +55,7 @@ current_datetime = datetime.now()
 time_stamp = current_datetime.strftime("%Y-%m-%d-%H:%M")
 zip_name = "/home/evert/Desktop/audio/" + time_stamp
 
-logging.basicConfig(filename="".join([time_stamp,'.log']), level=logging.INFO, format='%(asctime)s:%(levelname)s:%(message)s')
+logging.basicConfig(filename="".join(["/home/evert/Desktop/audio/logs/",time_stamp,'.log']), level=logging.INFO, format='%(asctime)s:%(levelname)s:%(message)s')
 
 with open(input_file, 'r') as file:
     for line in file:

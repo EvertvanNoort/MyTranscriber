@@ -52,7 +52,6 @@ def Transcribe(audio_path, rttm_path, model_id, output_path):#, language=None):
 
             # transcription = pipe(audio, generate_kwargs={"language": "dutch", "task": "transcribe"})
             transcription = pipe(audio, generate_kwargs={"task": "transcribe"})
-            # transcription = pipe(audio, generate_kwargs={"language": "spanish"})#, "task": "transcribe"})
             text = transcription["text"]
             outputtext.append(text)
             transcriptions.append({
@@ -68,8 +67,6 @@ def Transcribe(audio_path, rttm_path, model_id, output_path):#, language=None):
     with open(output_path + ".txt",'w', encoding="utf-8") as f:       
         # f.write(outputtext)
         f.write('\n'.join(outputtext))
-
-  
 
 # Function to merge transcriptions
 def merge_transcriptions(input_file, output_file):
@@ -111,19 +108,3 @@ def merge_transcriptions(input_file, output_file):
 
     with open(output_file + ".json", 'w', encoding='utf-8') as file:
         json.dump(merged_output, file, ensure_ascii=False, indent=4)
-    
-    # with open(output_file + "elaborate.txt",'w', encoding="utf-8") as f:       
-        # f.write(outputtext)
-        # f.write('\n'.join(merged_output[2]))  
-
-# Example usage
-# audio_path = '/path/to/audio.mp3'
-# rttm_path = '/path/to/rttm.txt'
-# output_path = '/path/to/output.json'
-# model_id = "openai/whisper-large-v3"
-# language = "dutch"
-# Transcribe(audio_path, rttm_path, model_id, output_path, language)
-
-# input_file = '/path/to/output.json'
-# output_file = '/path/to/merged_output.json'
-# merge_transcriptions(input_file, output_file)

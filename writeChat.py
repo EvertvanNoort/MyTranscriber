@@ -16,7 +16,6 @@ def create_html_chat_message(timestamp, speaker, transcription, speakers=None, s
     max_different_chatboxes = 4
     chatbox_kind = int(speaker[-1]) % max_different_chatboxes
 
-    # speaker_class = "user1" if speaker == "SPEAKER_01" else "user2"  # Adjust as needed
     speaker_class = ''.join(['user',str(chatbox_kind)])
     return f'<div class="chat-message {speaker_class}">\n' \
            f'    <span class="user-name">{speaker_name}:</span>\n' \
@@ -173,11 +172,3 @@ def process_transcription_file(file_path):#, speakers=None):
 </body>
 </html>"""
     return html_output
-
-# Example usage
-# speakers = {"SPEAKER_01": "Alice", "SPEAKER_02": "Bob"}  # Adjust speaker names as necessary
-# output_html = process_transcription_file('path/to/your/jsonfile.json', speakers)
-
-# Write the HTML output to a file
-# with open('output.html', 'w', encoding='utf-8') as f:
-    # f.write(output_html)
